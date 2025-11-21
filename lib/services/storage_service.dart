@@ -17,9 +17,10 @@ class StorageService {
   Future<void> init() async {
     await Hive.initFlutter();
 
-    // 注册适配器（需要在运行build_runner后取消注释）
-    // Hive.registerAdapter(TimelineAdapter());
-    // Hive.registerAdapter(TimelineEventAdapter());
+    // 注册适配器
+    Hive.registerAdapter(EventTypeAdapter());
+    Hive.registerAdapter(TimelineEventAdapter());
+    Hive.registerAdapter(TimelineAdapter());
 
     // 打开boxes
     _timelineBox = await Hive.openBox<Timeline>(AppConstants.timelineBoxName);

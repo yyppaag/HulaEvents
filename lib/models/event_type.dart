@@ -1,18 +1,28 @@
+import 'package:hive/hive.dart';
+
+part 'event_type.g.dart';
+
 /// 事件类型枚举
+@HiveType(typeId: 2)
 enum EventType {
   /// 历史事件
+  @HiveField(0)
   history,
 
   /// 人物生平
+  @HiveField(1)
   biography,
 
   /// 电影宣发
+  @HiveField(2)
   movie,
 
   /// 项目进度
+  @HiveField(3)
   project,
 
   /// 自定义类型
+  @HiveField(4)
   custom;
 
   /// 获取事件类型的显示名称
