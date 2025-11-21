@@ -162,6 +162,7 @@ class _TimelineDetailScreenState extends State<TimelineDetailScreen> {
               isFirst: isFirst,
               isLast: isLast,
               timelineId: timeline.id,
+              onEventTap: _showEventDetail,
             );
           },
         );
@@ -266,6 +267,159 @@ class _TimelineDetailScreenState extends State<TimelineDetailScreen> {
         );
       },
     );
+  }
+
+  void _showEventDetail(BuildContext context, TimelineEvent event, String timelineId) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.7,
+          minChildSize: 0.5,
+          maxChildSize: 0.95,
+          expand: false,
+          builder: (context, scrollController) {
+            return SingleChildScrollView(
+              controller: scrollController,
+              padding: const EdgeInsets.all(AppConstants.largePadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    event.title,
+                    style: Theme.of(context).textTheme.displaySmall,
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Icon(Icons.access_time, size: 16, color: Colors.grey.shade600),
+                      const SizedBox(width: 8),
+                      Text(
+                        DateFormat(AppConstants.dateFormatFull).format(event.timestamp),
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    event.description,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  if (event.tags.isNotEmpty) ...[
+                    const SizedBox(height: 24),
+                    Text(
+                      '标签',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: event.tags.map((tag) {
+                        return Chip(
+                          label: Text(tag),
+                          backgroundColor: _getEventTypeColorForType(event.type).withOpacity(0.1),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                  const SizedBox(height: 32),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CreateEventScreen(
+                                  timelineId: timelineId,
+                                  event: event,
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.edit),
+                          label: const Text('编辑'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () async {
+                            Navigator.pop(context);
+                            // 显示删除确认对话框
+                            final confirmed = await showDialog<bool>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('删除事件'),
+                                content: const Text('确定要删除这个事件吗？此操作无法撤销。'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context, false),
+                                    child: const Text('取消'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context, true),
+                                    child: const Text(
+                                      '删除',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                            if (confirmed == true && context.mounted) {
+                              await context.read<TimelineProvider>()
+                                  .removeEventFromTimeline(timelineId, event.id);
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('事件已删除')),
+                                );
+                              }
+                            }
+                          },
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          label: const Text('删除', style: TextStyle(color: Colors.red)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Color _getEventTypeColorForType(EventType type) {
+    switch (type) {
+      case EventType.history:
+        return const Color(0xFF3B82F6);
+      case EventType.biography:
+        return const Color(0xFF10B981);
+      case EventType.movie:
+        return const Color(0xFFF59E0B);
+      case EventType.project:
+        return const Color(0xFF8B5CF6);
+      case EventType.custom:
+        return const Color(0xFF6B7280);
+    }
   }
 }
 
@@ -407,12 +561,14 @@ class _TimelineEventTile extends StatelessWidget {
   final bool isFirst;
   final bool isLast;
   final String timelineId;
+  final void Function(BuildContext, TimelineEvent, String) onEventTap;
 
   const _TimelineEventTile({
     required this.event,
     required this.isFirst,
     required this.isLast,
     required this.timelineId,
+    required this.onEventTap,
   });
 
   @override
@@ -446,7 +602,7 @@ class _TimelineEventTile extends StatelessWidget {
         child: Card(
           child: InkWell(
             onTap: () {
-              _showEventDetail(context, event, timelineId);
+              onEventTap(context, event, timelineId);
             },
             borderRadius: BorderRadius.circular(AppConstants.defaultRadius),
             child: Padding(
@@ -539,144 +695,6 @@ class _TimelineEventTile extends StatelessWidget {
       case EventType.custom:
         return const Color(0xFF6B7280);
     }
-  }
-
-  void _showEventDetail(BuildContext context, TimelineEvent event, String timelineId) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.7,
-          minChildSize: 0.5,
-          maxChildSize: 0.95,
-          expand: false,
-          builder: (context, scrollController) {
-            return SingleChildScrollView(
-              controller: scrollController,
-              padding: const EdgeInsets.all(AppConstants.largePadding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    event.title,
-                    style: Theme.of(context).textTheme.displaySmall,
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Icon(Icons.access_time, size: 16, color: Colors.grey.shade600),
-                      const SizedBox(width: 8),
-                      Text(
-                        DateFormat(AppConstants.dateFormatFull).format(event.timestamp),
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    event.description,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                  if (event.tags.isNotEmpty) ...[
-                    const SizedBox(height: 24),
-                    Text(
-                      '标签',
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: event.tags.map((tag) {
-                        return Chip(
-                          label: Text(tag),
-                          backgroundColor: _getEventTypeColor(event.type).withOpacity(0.1),
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                  const SizedBox(height: 32),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => CreateEventScreen(
-                                  timelineId: timelineId,
-                                  event: event,
-                                ),
-                              ),
-                            );
-                          },
-                          icon: const Icon(Icons.edit),
-                          label: const Text('编辑'),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () async {
-                            Navigator.pop(context);
-                            // 显示删除确认对话框
-                            final confirmed = await showDialog<bool>(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('删除事件'),
-                                content: const Text('确定要删除这个事件吗？此操作无法撤销。'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context, false),
-                                    child: const Text('取消'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context, true),
-                                    child: const Text(
-                                      '删除',
-                                      style: TextStyle(color: Colors.red),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                            if (confirmed == true && context.mounted) {
-                              await context.read<TimelineProvider>()
-                                  .removeEventFromTimeline(timelineId, event.id);
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('事件已删除')),
-                                );
-                              }
-                            }
-                          },
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          label: const Text('删除', style: TextStyle(color: Colors.red)),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
   }
 }
 
