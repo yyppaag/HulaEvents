@@ -11,19 +11,27 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // 初始化存储服务
-  await StorageService().init();
+  final storageService = StorageService();
+  await storageService.init();
 
-  runApp(const MyApp());
+  // 检查是否首次启动
+  final isFirstLaunch = storageService.getSetting<bool>('isFirstLaunch', defaultValue: true) ?? true;
+
+  runApp(MyApp(isFirstLaunch: isFirstLaunch));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isFirstLaunch;
+
+  const MyApp({super.key, required this.isFirstLaunch});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => TimelineProvider()),
+        ChangeNotifierProvider(
+          create: (_) => TimelineProvider()..loadTimelines(),
+        ),
       ],
       child: MaterialApp(
         title: 'Hula Events',
@@ -40,7 +48,7 @@ class MyApp extends StatelessWidget {
           Locale('en', ''), // English
           Locale('zh', ''), // Chinese
         ],
-        home: const HomeScreen(),
+        home: HomeScreen(isFirstLaunch: isFirstLaunch),
       ),
     );
   }

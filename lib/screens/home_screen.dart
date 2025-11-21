@@ -4,13 +4,16 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import '../providers/timeline_provider.dart';
 import '../models/models.dart';
 import '../constants/app_constants.dart';
+import '../services/storage_service.dart';
 import 'timeline_detail_screen.dart';
 import 'create_timeline_screen.dart';
 import 'search_screen.dart';
 import 'data_management_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final bool isFirstLaunch;
+
+  const HomeScreen({super.key, this.isFirstLaunch = false});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -20,10 +23,32 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // 加载时间线数据
+    // 首次启动时加载示例数据
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<TimelineProvider>().loadTimelines();
+      _initializeApp();
     });
+  }
+
+  Future<void> _initializeApp() async {
+    final provider = context.read<TimelineProvider>();
+
+    if (widget.isFirstLaunch) {
+      // 首次启动，加载示例数据
+      await provider.loadSampleData();
+      // 标记为非首次启动
+      await StorageService().saveSetting('isFirstLaunch', false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('欢迎使用 Hula Events！已为您加载示例数据'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    } else {
+      // 正常加载数据
+      await provider.loadTimelines();
+    }
   }
 
   @override

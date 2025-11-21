@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../models/models.dart';
 import '../services/storage_service.dart';
+import '../utils/sample_data.dart';
 
 /// 时间线状态管理Provider
 class TimelineProvider extends ChangeNotifier {
@@ -37,6 +38,28 @@ class TimelineProvider extends ChangeNotifier {
     } catch (e) {
       _isLoading = false;
       _errorMessage = '加载时间线失败: $e';
+      notifyListeners();
+    }
+  }
+
+  /// 加载示例数据（首次启动时）
+  Future<void> loadSampleData() async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      final sampleTimelines = SampleData.generateSampleTimelines();
+      for (final timeline in sampleTimelines) {
+        await _storageService.saveTimeline(timeline);
+      }
+
+      await loadTimelines();
+
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      _errorMessage = '加载示例数据失败: $e';
       notifyListeners();
     }
   }
