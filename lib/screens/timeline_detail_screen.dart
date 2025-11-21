@@ -5,6 +5,7 @@ import 'package:timeline_tile/timeline_tile.dart';
 import '../providers/timeline_provider.dart';
 import '../models/models.dart';
 import '../constants/app_constants.dart';
+import 'create_event_screen.dart';
 
 class TimelineDetailScreen extends StatelessWidget {
   const TimelineDetailScreen({super.key});
@@ -62,6 +63,7 @@ class TimelineDetailScreen extends StatelessWidget {
                             event: event,
                             isFirst: isFirst,
                             isLast: isLast,
+                            timelineId: timeline.id,
                           );
                         },
                       ),
@@ -72,7 +74,18 @@ class TimelineDetailScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          // TODO: 添加事件
+          final provider = context.read<TimelineProvider>();
+          final timeline = provider.selectedTimeline;
+          if (timeline != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CreateEventScreen(
+                  timelineId: timeline.id,
+                ),
+              ),
+            );
+          }
         },
         icon: const Icon(Icons.add),
         label: const Text('添加事件'),
@@ -289,11 +302,13 @@ class _TimelineEventTile extends StatelessWidget {
   final TimelineEvent event;
   final bool isFirst;
   final bool isLast;
+  final String timelineId;
 
   const _TimelineEventTile({
     required this.event,
     required this.isFirst,
     required this.isLast,
+    required this.timelineId,
   });
 
   @override
@@ -327,7 +342,7 @@ class _TimelineEventTile extends StatelessWidget {
         child: Card(
           child: InkWell(
             onTap: () {
-              _showEventDetail(context, event);
+              _showEventDetail(context, event, timelineId);
             },
             borderRadius: BorderRadius.circular(AppConstants.defaultRadius),
             child: Padding(
@@ -422,7 +437,7 @@ class _TimelineEventTile extends StatelessWidget {
     }
   }
 
-  void _showEventDetail(BuildContext context, TimelineEvent event) {
+  void _showEventDetail(BuildContext context, TimelineEvent event, String timelineId) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -495,7 +510,15 @@ class _TimelineEventTile extends StatelessWidget {
                         child: OutlinedButton.icon(
                           onPressed: () {
                             Navigator.pop(context);
-                            // TODO: 编辑事件
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CreateEventScreen(
+                                  timelineId: timelineId,
+                                  event: event,
+                                ),
+                              ),
+                            );
                           },
                           icon: const Icon(Icons.edit),
                           label: const Text('编辑'),
@@ -504,9 +527,38 @@ class _TimelineEventTile extends StatelessWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () {
+                          onPressed: () async {
                             Navigator.pop(context);
-                            // TODO: 删除事件
+                            // 显示删除确认对话框
+                            final confirmed = await showDialog<bool>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('删除事件'),
+                                content: const Text('确定要删除这个事件吗？此操作无法撤销。'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context, false),
+                                    child: const Text('取消'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context, true),
+                                    child: const Text(
+                                      '删除',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                            if (confirmed == true && context.mounted) {
+                              await context.read<TimelineProvider>()
+                                  .removeEventFromTimeline(timelineId, event.id);
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('事件已删除')),
+                                );
+                              }
+                            }
                           },
                           icon: const Icon(Icons.delete, color: Colors.red),
                           label: const Text('删除', style: TextStyle(color: Colors.red)),

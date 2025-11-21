@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import '../providers/timeline_provider.dart';
 import '../models/models.dart';
 import '../constants/app_constants.dart';
 import 'timeline_detail_screen.dart';
 import 'create_timeline_screen.dart';
+import 'search_screen.dart';
+import 'data_management_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -32,13 +35,61 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              // TODO: 实现搜索功能
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SearchScreen(),
+                ),
+              );
             },
           ),
           IconButton(
             icon: const Icon(Icons.more_vert),
             onPressed: () {
-              // TODO: 显示更多选项
+              showModalBottomSheet(
+                context: context,
+                builder: (context) {
+                  return SafeArea(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          leading: const Icon(Icons.storage),
+                          title: const Text('数据管理'),
+                          subtitle: const Text('导入/导出时间线数据'),
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const DataManagementScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.info_outline),
+                          title: const Text('关于应用'),
+                          subtitle: const Text('版本 ${AppConstants.appVersion}'),
+                          onTap: () {
+                            Navigator.pop(context);
+                            showAboutDialog(
+                              context: context,
+                              applicationName: AppConstants.appName,
+                              applicationVersion: AppConstants.appVersion,
+                              applicationIcon: const Icon(Icons.timeline, size: 48),
+                              children: [
+                                const Text('一个优雅的时间线动画应用'),
+                                const Text('\n用于按照时间顺序展示和管理各类事件'),
+                              ],
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
             },
           ),
         ],
@@ -105,24 +156,35 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           }
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(AppConstants.defaultPadding),
-            itemCount: provider.timelines.length,
-            itemBuilder: (context, index) {
-              final timeline = provider.timelines[index];
-              return _TimelineCard(
-                timeline: timeline,
-                onTap: () {
-                  provider.selectTimeline(timeline);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const TimelineDetailScreen(),
+          return AnimationLimiter(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(AppConstants.defaultPadding),
+              itemCount: provider.timelines.length,
+              itemBuilder: (context, index) {
+                final timeline = provider.timelines[index];
+                return AnimationConfiguration.staggeredList(
+                  position: index,
+                  duration: const Duration(milliseconds: 375),
+                  child: SlideAnimation(
+                    verticalOffset: 50.0,
+                    child: FadeInAnimation(
+                      child: _TimelineCard(
+                        timeline: timeline,
+                        onTap: () {
+                          provider.selectTimeline(timeline);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const TimelineDetailScreen(),
+                            ),
+                          );
+                        },
+                      ),
                     ),
-                  );
-                },
-              );
-            },
+                  ),
+                );
+              },
+            ),
           );
         },
       ),
