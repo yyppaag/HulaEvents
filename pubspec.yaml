@@ -1,0 +1,71 @@
+name: hula_events
+description: A Flutter timeline animation app for visualizing events chronologically
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI Components
+  cupertino_icons: ^1.0.6
+
+  # State Management
+  provider: ^6.1.1
+
+  # Local Storage
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
+  # JSON Serialization
+  json_annotation: ^4.8.1
+
+  # Date & Time
+  intl: ^0.18.1
+
+  # Timeline UI
+  timeline_tile: ^2.0.0
+
+  # Animations
+  animations: ^2.0.10
+  flutter_staggered_animations: ^1.1.1
+
+  # Image Handling
+  cached_network_image: ^3.3.0
+  image_picker: ^1.0.5
+
+  # UI Enhancements
+  shimmer: ^3.0.0
+
+  # Utilities
+  uuid: ^4.2.2
+  equatable: ^2.0.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+
+  # Code Generation
+  build_runner: ^2.4.7
+  hive_generator: ^2.0.1
+  json_serializable: ^6.7.1
+
+flutter:
+  uses-material-design: true
+
+  # Assets
+  assets:
+    - assets/images/
+    - assets/animations/
+
+  # Fonts (可选，后续可添加自定义字体)
+  # fonts:
+  #   - family: CustomFont
+  #     fonts:
+  #       - asset: fonts/CustomFont-Regular.ttf
+  #       - asset: fonts/CustomFont-Bold.ttf
+  #         weight: 700
