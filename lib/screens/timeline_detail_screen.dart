@@ -5,10 +5,25 @@ import 'package:timeline_tile/timeline_tile.dart';
 import '../providers/timeline_provider.dart';
 import '../models/models.dart';
 import '../constants/app_constants.dart';
+import '../widgets/horizontal_timeline_view.dart';
+import '../widgets/calendar_view.dart';
 import 'create_event_screen.dart';
 
-class TimelineDetailScreen extends StatelessWidget {
+enum TimelineViewMode {
+  vertical,
+  horizontal,
+  calendar,
+}
+
+class TimelineDetailScreen extends StatefulWidget {
   const TimelineDetailScreen({super.key});
+
+  @override
+  State<TimelineDetailScreen> createState() => _TimelineDetailScreenState();
+}
+
+class _TimelineDetailScreenState extends State<TimelineDetailScreen> {
+  TimelineViewMode _viewMode = TimelineViewMode.vertical;
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +31,48 @@ class TimelineDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('时间线详情'),
         actions: [
+          // 视图切换按钮
+          PopupMenuButton<TimelineViewMode>(
+            icon: Icon(_getViewModeIcon(_viewMode)),
+            tooltip: '切换视图',
+            onSelected: (mode) {
+              setState(() {
+                _viewMode = mode;
+              });
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: TimelineViewMode.vertical,
+                child: Row(
+                  children: [
+                    Icon(Icons.view_timeline),
+                    SizedBox(width: 12),
+                    Text('垂直时间线'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: TimelineViewMode.horizontal,
+                child: Row(
+                  children: [
+                    Icon(Icons.view_week),
+                    SizedBox(width: 12),
+                    Text('横向时间线'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: TimelineViewMode.calendar,
+                child: Row(
+                  children: [
+                    Icon(Icons.calendar_month),
+                    SizedBox(width: 12),
+                    Text('日历视图'),
+                  ],
+                ),
+              ),
+            ],
+          ),
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {
@@ -44,28 +101,23 @@ class TimelineDetailScreen extends StatelessWidget {
 
           return Column(
             children: [
-              // 时间线头部信息
-              _TimelineHeader(timeline: timeline),
+              // 时间线头部信息（仅在垂直视图显示）
+              if (_viewMode == TimelineViewMode.vertical)
+                _TimelineHeader(timeline: timeline),
 
-              // 时间线事件列表
+              // 根据视图模式显示不同的内容
               Expanded(
                 child: sortedEvents.isEmpty
                     ? _EmptyTimelineView()
-                    : ListView.builder(
-                        padding: const EdgeInsets.all(AppConstants.defaultPadding),
-                        itemCount: sortedEvents.length,
-                        itemBuilder: (context, index) {
-                          final event = sortedEvents[index];
-                          final isFirst = index == 0;
-                          final isLast = index == sortedEvents.length - 1;
-
-                          return _TimelineEventTile(
-                            event: event,
-                            isFirst: isFirst,
-                            isLast: isLast,
-                            timelineId: timeline.id,
+                    : AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        transitionBuilder: (child, animation) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: child,
                           );
                         },
+                        child: _buildTimelineView(timeline, sortedEvents),
                       ),
               ),
             ],
@@ -91,6 +143,58 @@ class TimelineDetailScreen extends StatelessWidget {
         label: const Text('添加事件'),
       ),
     );
+  }
+
+  Widget _buildTimelineView(Timeline timeline, List<TimelineEvent> sortedEvents) {
+    switch (_viewMode) {
+      case TimelineViewMode.vertical:
+        return ListView.builder(
+          key: const ValueKey('vertical'),
+          padding: const EdgeInsets.all(AppConstants.defaultPadding),
+          itemCount: sortedEvents.length,
+          itemBuilder: (context, index) {
+            final event = sortedEvents[index];
+            final isFirst = index == 0;
+            final isLast = index == sortedEvents.length - 1;
+
+            return _TimelineEventTile(
+              event: event,
+              isFirst: isFirst,
+              isLast: isLast,
+              timelineId: timeline.id,
+            );
+          },
+        );
+
+      case TimelineViewMode.horizontal:
+        return HorizontalTimelineView(
+          key: const ValueKey('horizontal'),
+          timeline: timeline,
+          onEventTap: (event) {
+            _showEventDetail(context, event, timeline.id);
+          },
+        );
+
+      case TimelineViewMode.calendar:
+        return CalendarView(
+          key: const ValueKey('calendar'),
+          timeline: timeline,
+          onEventTap: (event) {
+            _showEventDetail(context, event, timeline.id);
+          },
+        );
+    }
+  }
+
+  IconData _getViewModeIcon(TimelineViewMode mode) {
+    switch (mode) {
+      case TimelineViewMode.vertical:
+        return Icons.view_timeline;
+      case TimelineViewMode.horizontal:
+        return Icons.view_week;
+      case TimelineViewMode.calendar:
+        return Icons.calendar_month;
+    }
   }
 
   void _showMoreOptions(BuildContext context) {
