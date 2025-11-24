@@ -12,6 +12,7 @@ class AppConstants {
   /// Hive数据库相关
   static const String timelineBoxName = 'timelines';
   static const String eventBoxName = 'events';
+  static const String userBoxName = 'users';
   static const String settingsBoxName = 'settings';
 
   /// 动画持续时间（毫秒）

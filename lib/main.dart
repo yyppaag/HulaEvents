@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'constants/app_theme.dart';
 import 'providers/timeline_provider.dart';
+import 'providers/user_provider.dart';
 import 'services/storage_service.dart';
 import 'screens/home_screen.dart';
 
@@ -31,6 +32,9 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (_) => TimelineProvider()..loadTimelines(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => UserProvider()..initialize(),
         ),
       ],
       child: MaterialApp(

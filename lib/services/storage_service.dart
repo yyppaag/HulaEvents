@@ -11,6 +11,7 @@ class StorageService {
 
   /// Hive boxes
   late Box<Timeline> _timelineBox;
+  late Box<User> _userBox;
   late Box _settingsBox;
 
   /// 初始化Hive数据库
@@ -21,9 +22,12 @@ class StorageService {
     Hive.registerAdapter(EventTypeAdapter());
     Hive.registerAdapter(TimelineEventAdapter());
     Hive.registerAdapter(TimelineAdapter());
+    Hive.registerAdapter(SubscriptionTypeAdapter());
+    Hive.registerAdapter(UserAdapter());
 
     // 打开boxes
     _timelineBox = await Hive.openBox<Timeline>(AppConstants.timelineBoxName);
+    _userBox = await Hive.openBox<User>(AppConstants.userBoxName);
     _settingsBox = await Hive.openBox(AppConstants.settingsBoxName);
   }
 
@@ -60,6 +64,40 @@ class StorageService {
     await _timelineBox.clear();
   }
 
+  // ============ 用户相关方法 ============
+
+  /// 获取所有用户
+  List<User> getAllUsers() {
+    return _userBox.values.toList();
+  }
+
+  /// 根据ID获取用户
+  User? getUser(String id) {
+    return _userBox.get(id);
+  }
+
+  /// 保存用户
+  Future<void> saveUser(User user) async {
+    await _userBox.put(user.id, user);
+  }
+
+  /// 删除用户
+  Future<void> deleteUser(String id) async {
+    await _userBox.delete(id);
+  }
+
+  /// 更新用户
+  Future<void> updateUser(User user) async {
+    await _userBox.put(user.id, user);
+  }
+
+  /// 清空所有用户
+  Future<void> clearAllUsers() async {
+    await _userBox.clear();
+  }
+
+  // ============ 设置相关方法 ============
+
   /// 获取设置
   T? getSetting<T>(String key, {T? defaultValue}) {
     return _settingsBox.get(key, defaultValue: defaultValue) as T?;
@@ -73,6 +111,7 @@ class StorageService {
   /// 关闭数据库
   Future<void> close() async {
     await _timelineBox.close();
+    await _userBox.close();
     await _settingsBox.close();
   }
 }

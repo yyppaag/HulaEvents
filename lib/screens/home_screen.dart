@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import '../providers/timeline_provider.dart';
+import '../providers/user_provider.dart';
 import '../models/models.dart';
 import '../constants/app_constants.dart';
 import '../services/storage_service.dart';
@@ -9,6 +10,8 @@ import 'timeline_detail_screen.dart';
 import 'create_timeline_screen.dart';
 import 'search_screen.dart';
 import 'data_management_screen.dart';
+import 'user_profile_screen.dart';
+import 'auth_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final bool isFirstLaunch;
@@ -57,6 +60,50 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text(AppConstants.appName),
         actions: [
+          // 用户头像/登录按钮
+          Consumer<UserProvider>(
+            builder: (context, userProvider, child) {
+              if (userProvider.isLoggedIn) {
+                // 已登录，显示头像
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const UserProfileScreen(),
+                        ),
+                      );
+                    },
+                    child: CircleAvatar(
+                      backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+                      child: Text(
+                        userProvider.displayName.substring(0, 1).toUpperCase(),
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              } else {
+                // 未登录，显示登录按钮
+                return IconButton(
+                  icon: const Icon(Icons.login),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AuthScreen(),
+                      ),
+                    );
+                  },
+                );
+              }
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
