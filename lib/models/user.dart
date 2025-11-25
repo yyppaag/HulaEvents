@@ -5,9 +5,13 @@ import 'package:equatable/equatable.dart';
 part 'user.g.dart';
 
 /// 用户订阅类型
+@HiveType(typeId: 4)
 enum SubscriptionType {
+  @HiveField(0)
   free,
+  @HiveField(1)
   premium,
+  @HiveField(2)
   professional,
 }
 
@@ -123,15 +127,17 @@ class User extends Equatable {
 
   /// 获取时间线数量限制
   int get timelineCreateLimit {
-    if (isProfessional) return -1; // 无限制
-    if (isPremium) return -1; // 无限制
+    if (isProfessional) return -1; // 专业会员：无限制
+    if (isPremium) return -1; // 高级会员：无限制
     return timelineLimit ?? 3; // 免费用户默认3条
   }
 
-  /// 获取事件数量限制
+  /// 获取事件数量限制（单条时间线）
   int get eventCreateLimit {
-    if (isProfessional) return -1; // 无限制
-    if (isPremium) return -1; // 无限制
+    if (isProfessional) return -1; // 专业会员：无限制
+    if (subscriptionType == SubscriptionType.premium) {
+      return eventLimit ?? 100; // 高级会员：100个事件
+    }
     return eventLimit ?? 10; // 免费用户默认每条时间线10个事件
   }
 

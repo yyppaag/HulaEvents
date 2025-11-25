@@ -2,3 +2,4 @@
 export 'event_type.dart';
 export 'timeline_event.dart';
 export 'timeline.dart';
+export 'user.dart';

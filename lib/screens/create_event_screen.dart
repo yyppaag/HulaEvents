@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
 import '../providers/timeline_provider.dart';
+import '../providers/user_provider.dart';
 import '../models/models.dart';
 import '../constants/app_constants.dart';
+import 'user_profile_screen.dart';
 
 class CreateEventScreen extends StatefulWidget {
   final String timelineId;
@@ -111,6 +113,29 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       return;
     }
 
+    // 如果是新增事件，检查权限
+    if (!isEditMode) {
+      final userProvider = context.read<UserProvider>();
+      final timelineProvider = context.read<TimelineProvider>();
+      final timeline = timelineProvider.timelines
+          .firstWhere((t) => t.id == widget.timelineId);
+      final currentEventCount = timeline.events.length;
+
+      // 如果用户已登录，检查是否超出限制
+      if (userProvider.isLoggedIn) {
+        if (!userProvider.canCreateEvent(currentEventCount)) {
+          _showUpgradeDialog();
+          return;
+        }
+      } else {
+        // 未登录用户限制为每条时间线10个事件
+        if (currentEventCount >= 10) {
+          _showLoginDialog();
+          return;
+        }
+      }
+    }
+
     setState(() {
       _isSaving = true;
     });
@@ -173,6 +198,68 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         });
       }
     }
+  }
+
+  void _showUpgradeDialog() {
+    final userProvider = context.read<UserProvider>();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('达到事件创建上限'),
+        content: Text(
+          '您当前是${userProvider.isPremium ? "高级会员" : "免费用户"}，'
+          '单条时间线已达到事件创建上限（${userProvider.eventCreateLimit}个）。\n\n'
+          '升级为专业会员即可添加无限个事件！',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('取消'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const UserProfileScreen(),
+                ),
+              );
+            },
+            child: const Text('查看会员'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLoginDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('达到创建上限'),
+        content: const Text(
+          '游客模式下每条时间线最多只能添加10个事件。\n\n'
+          '登录或注册后即可享受更多权限！',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('取消'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const UserProfileScreen(),
+                ),
+              );
+            },
+            child: const Text('去登录'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

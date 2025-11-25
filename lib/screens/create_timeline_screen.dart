@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import '../providers/timeline_provider.dart';
+import '../providers/user_provider.dart';
 import '../models/models.dart';
 import '../constants/app_constants.dart';
+import 'user_profile_screen.dart';
 
 class CreateTimelineScreen extends StatefulWidget {
   const CreateTimelineScreen({super.key});
@@ -31,6 +33,25 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
       return;
     }
 
+    // 检查用户权限
+    final userProvider = context.read<UserProvider>();
+    final timelineProvider = context.read<TimelineProvider>();
+    final currentTimelineCount = timelineProvider.timelines.length;
+
+    // 如果用户已登录，检查是否超出限制
+    if (userProvider.isLoggedIn) {
+      if (!userProvider.canCreateTimeline(currentTimelineCount)) {
+        _showUpgradeDialog();
+        return;
+      }
+    } else {
+      // 未登录用户限制为3个时间线
+      if (currentTimelineCount >= 3) {
+        _showLoginDialog();
+        return;
+      }
+    }
+
     setState(() {
       _isCreating = true;
     });
@@ -46,7 +67,7 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
         updatedAt: DateTime.now(),
       );
 
-      await context.read<TimelineProvider>().addTimeline(timeline);
+      await timelineProvider.addTimeline(timeline);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -67,6 +88,68 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
         });
       }
     }
+  }
+
+  void _showUpgradeDialog() {
+    final userProvider = context.read<UserProvider>();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('达到时间线创建上限'),
+        content: Text(
+          '您当前是${userProvider.isPremium ? "高级会员" : "免费用户"}，'
+          '已达到时间线创建上限（${userProvider.timelineCreateLimit}个）。\n\n'
+          '升级为专业会员即可创建无限个时间线！',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('取消'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const UserProfileScreen(),
+                ),
+              );
+            },
+            child: const Text('查看会员'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLoginDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('达到创建上限'),
+        content: const Text(
+          '游客模式下最多只能创建3个时间线。\n\n'
+          '登录或注册后即可享受更多权限！',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('取消'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const UserProfileScreen(),
+                ),
+              );
+            },
+            child: const Text('去登录'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
