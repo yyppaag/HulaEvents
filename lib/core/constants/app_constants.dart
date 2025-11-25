@@ -14,6 +14,9 @@ class AppConstants {
   static const String eventBoxName = 'events';
   static const String settingsBoxName = 'settings';
 
+  /// Data migration version - increment this when Hive schema changes
+  static const int hiveMigrationVersion = 2;
+
   /// Animation duration (milliseconds)
   static const int animationDurationShort = 200;
   static const int animationDurationMedium = 400;

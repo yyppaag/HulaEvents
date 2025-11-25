@@ -51,6 +51,10 @@ class TimelineLocalDataSourceImpl implements TimelineLocalDataSource {
     try {
       await Hive.initFlutter();
 
+      // Check migration version BEFORE registering adapters
+      // This ensures we can detect incompatible data and clear it
+      await _handleDataMigration();
+
       // Register adapters
       if (!Hive.isAdapterRegistered(0)) {
         Hive.registerAdapter(TimelineEventModelAdapter());
@@ -81,6 +85,41 @@ class TimelineLocalDataSourceImpl implements TimelineLocalDataSource {
       _isInitialized = true;
     } catch (e) {
       throw StorageException('Failed to initialize storage: $e');
+    }
+  }
+
+  /// Handle data migration between versions
+  /// Clears incompatible data when migration version changes
+  Future<void> _handleDataMigration() async {
+    const migrationKey = 'hive_migration_version';
+
+    try {
+      // Open a simple box to check migration version
+      final migrationBox = await Hive.openBox('migration');
+      final storedVersion = migrationBox.get(migrationKey, defaultValue: 0) as int;
+
+      if (storedVersion < AppConstants.hiveMigrationVersion) {
+        // Data format has changed, clear all data boxes
+        await Hive.deleteBoxFromDisk(AppConstants.timelineBoxName);
+        await Hive.deleteBoxFromDisk(AppConstants.eventBoxName);
+        await Hive.deleteBoxFromDisk(AppConstants.settingsBoxName);
+
+        // Update migration version
+        await migrationBox.put(migrationKey, AppConstants.hiveMigrationVersion);
+      }
+
+      await migrationBox.close();
+    } catch (e) {
+      // If migration check fails, delete everything and start fresh
+      await Hive.deleteBoxFromDisk('migration');
+      await Hive.deleteBoxFromDisk(AppConstants.timelineBoxName);
+      await Hive.deleteBoxFromDisk(AppConstants.eventBoxName);
+      await Hive.deleteBoxFromDisk(AppConstants.settingsBoxName);
+
+      // Create fresh migration box
+      final migrationBox = await Hive.openBox('migration');
+      await migrationBox.put(migrationKey, AppConstants.hiveMigrationVersion);
+      await migrationBox.close();
     }
   }
 
