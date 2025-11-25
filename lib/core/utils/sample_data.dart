@@ -1,11 +1,13 @@
 import 'package:uuid/uuid.dart';
-import '../models/models.dart';
+import '../../features/timeline/domain/entities/timeline.dart';
+import '../../features/timeline/domain/entities/timeline_event.dart';
+import '../../features/timeline/domain/entities/event_type.dart';
 
-/// 示例数据工具类
+/// Sample data utility class
 class SampleData {
   static const _uuid = Uuid();
 
-  /// 生成示例时间线数据
+  /// Generate sample timeline data
   static List<Timeline> generateSampleTimelines() {
     return [
       _createHistoryTimeline(),
@@ -14,7 +16,7 @@ class SampleData {
     ];
   }
 
-  /// 创建历史事件示例
+  /// Create history event sample
   static Timeline _createHistoryTimeline() {
     final now = DateTime.now();
     return Timeline(
@@ -65,7 +67,7 @@ class SampleData {
     );
   }
 
-  /// 创建人物生平示例
+  /// Create biography sample
   static Timeline _createBiographyTimeline() {
     final now = DateTime.now();
     return Timeline(
@@ -133,7 +135,7 @@ class SampleData {
     );
   }
 
-  /// 创建电影宣发示例
+  /// Create movie promotion sample
   static Timeline _createMovieTimeline() {
     final now = DateTime.now();
     return Timeline(

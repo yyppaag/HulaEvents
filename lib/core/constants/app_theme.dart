@@ -1,35 +1,35 @@
 import 'package:flutter/material.dart';
 
-/// 应用主题配置
+/// Application theme configuration
 class AppTheme {
-  // 私有构造函数，防止实例化
+  // Private constructor to prevent instantiation
   AppTheme._();
 
-  /// 主色调
+  /// Primary colors
   static const Color primaryColor = Color(0xFF6366F1); // Indigo
   static const Color secondaryColor = Color(0xFFEC4899); // Pink
   static const Color accentColor = Color(0xFF8B5CF6); // Purple
 
-  /// 事件类型颜色
+  /// Event type colors
   static const Color historyColor = Color(0xFF3B82F6); // Blue
   static const Color biographyColor = Color(0xFF10B981); // Green
   static const Color movieColor = Color(0xFFF59E0B); // Amber
   static const Color projectColor = Color(0xFF8B5CF6); // Purple
   static const Color customColor = Color(0xFF6B7280); // Gray
 
-  /// 背景颜色
+  /// Background colors
   static const Color backgroundLight = Color(0xFFF9FAFB);
   static const Color backgroundDark = Color(0xFF111827);
   static const Color surfaceLight = Colors.white;
   static const Color surfaceDark = Color(0xFF1F2937);
 
-  /// 文本颜色
+  /// Text colors
   static const Color textPrimaryLight = Color(0xFF111827);
   static const Color textSecondaryLight = Color(0xFF6B7280);
   static const Color textPrimaryDark = Color(0xFFF9FAFB);
   static const Color textSecondaryDark = Color(0xFF9CA3AF);
 
-  /// 获取浅色主题
+  /// Light theme
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
@@ -39,12 +39,10 @@ class AppTheme {
         secondary: secondaryColor,
         tertiary: accentColor,
         surface: surfaceLight,
-        background: backgroundLight,
         error: Colors.red.shade400,
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onSurface: textPrimaryLight,
-        onBackground: textPrimaryLight,
       ),
       scaffoldBackgroundColor: backgroundLight,
       appBarTheme: const AppBarTheme(
@@ -145,7 +143,7 @@ class AppTheme {
     );
   }
 
-  /// 获取深色主题
+  /// Dark theme
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
@@ -155,12 +153,10 @@ class AppTheme {
         secondary: secondaryColor,
         tertiary: accentColor,
         surface: surfaceDark,
-        background: backgroundDark,
         error: Colors.red.shade400,
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onSurface: textPrimaryDark,
-        onBackground: textPrimaryDark,
       ),
       scaffoldBackgroundColor: backgroundDark,
       appBarTheme: const AppBarTheme(
@@ -261,7 +257,7 @@ class AppTheme {
     );
   }
 
-  /// 根据事件类型获取颜色
+  /// Get color by event type name
   static Color getColorByEventType(String eventTypeName) {
     switch (eventTypeName.toLowerCase()) {
       case 'history':

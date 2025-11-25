@@ -1,56 +1,39 @@
-import 'package:hive/hive.dart';
-import 'package:json_annotation/json_annotation.dart';
 import 'package:equatable/equatable.dart';
 import 'event_type.dart';
 
-part 'timeline_event.g.dart';
-
-/// 时间线事件模型
-@HiveType(typeId: 0)
-@JsonSerializable()
+/// Timeline event entity
 class TimelineEvent extends Equatable {
-  /// 事件唯一标识
-  @HiveField(0)
+  /// Event unique identifier
   final String id;
 
-  /// 事件标题
-  @HiveField(1)
+  /// Event title
   final String title;
 
-  /// 事件描述
-  @HiveField(2)
+  /// Event description
   final String description;
 
-  /// 事件时间戳
-  @HiveField(3)
+  /// Event timestamp
   final DateTime timestamp;
 
-  /// 事件类型
-  @HiveField(4)
+  /// Event type
   final EventType type;
 
-  /// 事件标签
-  @HiveField(5)
+  /// Event tags
   final List<String> tags;
 
-  /// 图片URL（可选）
-  @HiveField(6)
+  /// Image URL (optional)
   final String? imageUrl;
 
-  /// 视频URL（可选）
-  @HiveField(7)
+  /// Video URL (optional)
   final String? videoUrl;
 
-  /// 额外元数据
-  @HiveField(8)
+  /// Extra metadata
   final Map<String, dynamic>? metadata;
 
-  /// 事件颜色（可选）
-  @HiveField(9)
+  /// Event color (optional)
   final int? color;
 
-  /// 是否为重要事件
-  @HiveField(10)
+  /// Whether this is an important event
   final bool isImportant;
 
   const TimelineEvent({
@@ -67,14 +50,7 @@ class TimelineEvent extends Equatable {
     this.isImportant = false,
   });
 
-  /// 从JSON创建对象
-  factory TimelineEvent.fromJson(Map<String, dynamic> json) =>
-      _$TimelineEventFromJson(json);
-
-  /// 转换为JSON
-  Map<String, dynamic> toJson() => _$TimelineEventToJson(this);
-
-  /// 复制对象并修改部分字段
+  /// Copy with modified fields
   TimelineEvent copyWith({
     String? id,
     String? title,

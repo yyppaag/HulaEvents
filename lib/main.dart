@@ -1,37 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'constants/app_theme.dart';
-import 'providers/timeline_provider.dart';
-import 'services/storage_service.dart';
-import 'screens/home_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'core/constants/app_theme.dart';
+import 'core/router/app_router.dart';
+import 'features/timeline/data/datasources/timeline_local_datasource.dart';
 
 void main() async {
-  // 确保Flutter绑定初始化
+  // Ensure Flutter bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 初始化存储服务
-  await StorageService().init();
+  // Initialize local storage
+  await TimelineLocalDataSourceImpl().init();
 
-  runApp(const MyApp());
+  runApp(
+    // Wrap the app with ProviderScope for Riverpod
+    const ProviderScope(
+      child: HulaEventsApp(),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+/// Main application widget
+class HulaEventsApp extends StatelessWidget {
+  const HulaEventsApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => TimelineProvider()),
-      ],
-      child: MaterialApp(
-        title: 'Hula Events',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.system,
-        home: const HomeScreen(),
-      ),
+    return MaterialApp.router(
+      title: 'Hula Events',
+      debugShowCheckedModeBanner: false,
+
+      // Theme configuration
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
+
+      // GoRouter configuration
+      routerConfig: AppRouter.router,
     );
   }
 }

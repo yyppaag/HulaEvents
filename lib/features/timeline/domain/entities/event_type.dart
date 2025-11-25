@@ -1,21 +1,24 @@
-/// 事件类型枚举
+import 'package:flutter/material.dart';
+import '../../../../core/constants/app_theme.dart';
+
+/// Event type enumeration
 enum EventType {
-  /// 历史事件
+  /// Historical event
   history,
 
-  /// 人物生平
+  /// Biography
   biography,
 
-  /// 电影宣发
+  /// Movie promotion
   movie,
 
-  /// 项目进度
+  /// Project progress
   project,
 
-  /// 自定义类型
+  /// Custom type
   custom;
 
-  /// 获取事件类型的显示名称
+  /// Get display name of the event type
   String get displayName {
     switch (this) {
       case EventType.history:
@@ -31,7 +34,7 @@ enum EventType {
     }
   }
 
-  /// 获取事件类型的图标
+  /// Get icon of the event type
   String get icon {
     switch (this) {
       case EventType.history:
@@ -47,7 +50,23 @@ enum EventType {
     }
   }
 
-  /// 从字符串转换为事件类型
+  /// Get color of the event type
+  Color get color {
+    switch (this) {
+      case EventType.history:
+        return AppTheme.historyColor;
+      case EventType.biography:
+        return AppTheme.biographyColor;
+      case EventType.movie:
+        return AppTheme.movieColor;
+      case EventType.project:
+        return AppTheme.projectColor;
+      case EventType.custom:
+        return AppTheme.customColor;
+    }
+  }
+
+  /// Convert from string to event type
   static EventType fromString(String value) {
     return EventType.values.firstWhere(
       (e) => e.name == value,

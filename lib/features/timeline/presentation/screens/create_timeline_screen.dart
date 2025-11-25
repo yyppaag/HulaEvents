@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
-import '../providers/timeline_provider.dart';
-import '../models/models.dart';
-import '../constants/app_constants.dart';
+import '../../../../core/constants/app_constants.dart';
+import '../../domain/entities/event_type.dart';
+import '../../domain/entities/timeline.dart';
+import '../providers/timeline_providers.dart';
 
-class CreateTimelineScreen extends StatefulWidget {
+/// Screen for creating a new timeline
+class CreateTimelineScreen extends ConsumerStatefulWidget {
   const CreateTimelineScreen({super.key});
 
   @override
-  State<CreateTimelineScreen> createState() => _CreateTimelineScreenState();
+  ConsumerState<CreateTimelineScreen> createState() => _CreateTimelineScreenState();
 }
 
-class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
+class _CreateTimelineScreenState extends ConsumerState<CreateTimelineScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -46,13 +49,13 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
         updatedAt: DateTime.now(),
       );
 
-      await context.read<TimelineProvider>().addTimeline(timeline);
+      final success = await ref.read(timelinesProvider.notifier).addTimeline(timeline);
 
-      if (mounted) {
+      if (mounted && success) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('时间线创建成功')),
         );
-        Navigator.pop(context);
+        context.pop();
       }
     } catch (e) {
       if (mounted) {
@@ -170,7 +173,7 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: _getEventTypeColor(type).withOpacity(0.1),
+                      color: type.color.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -203,20 +206,5 @@ class _CreateTimelineScreenState extends State<CreateTimelineScreen> {
         );
       }).toList(),
     );
-  }
-
-  Color _getEventTypeColor(EventType type) {
-    switch (type) {
-      case EventType.history:
-        return const Color(0xFF3B82F6);
-      case EventType.biography:
-        return const Color(0xFF10B981);
-      case EventType.movie:
-        return const Color(0xFFF59E0B);
-      case EventType.project:
-        return const Color(0xFF8B5CF6);
-      case EventType.custom:
-        return const Color(0xFF6B7280);
-    }
   }
 }

@@ -1,49 +1,34 @@
-import 'package:hive/hive.dart';
-import 'package:json_annotation/json_annotation.dart';
 import 'package:equatable/equatable.dart';
 import 'event_type.dart';
 import 'timeline_event.dart';
 
-part 'timeline.g.dart';
-
-/// 时间线集合模型
-@HiveType(typeId: 1)
-@JsonSerializable()
+/// Timeline collection entity
 class Timeline extends Equatable {
-  /// 时间线唯一标识
-  @HiveField(0)
+  /// Timeline unique identifier
   final String id;
 
-  /// 时间线名称
-  @HiveField(1)
+  /// Timeline name
   final String name;
 
-  /// 时间线描述
-  @HiveField(2)
+  /// Timeline description
   final String description;
 
-  /// 时间线类别
-  @HiveField(3)
+  /// Timeline category
   final EventType category;
 
-  /// 时间线中的事件列表
-  @HiveField(4)
+  /// Events in the timeline
   final List<TimelineEvent> events;
 
-  /// 创建时间
-  @HiveField(5)
+  /// Created timestamp
   final DateTime createdAt;
 
-  /// 更新时间
-  @HiveField(6)
+  /// Updated timestamp
   final DateTime updatedAt;
 
-  /// 封面图片URL（可选）
-  @HiveField(7)
+  /// Cover image URL (optional)
   final String? coverImageUrl;
 
-  /// 主题颜色（可选）
-  @HiveField(8)
+  /// Theme color (optional)
   final int? themeColor;
 
   const Timeline({
@@ -58,14 +43,7 @@ class Timeline extends Equatable {
     this.themeColor,
   });
 
-  /// 从JSON创建对象
-  factory Timeline.fromJson(Map<String, dynamic> json) =>
-      _$TimelineFromJson(json);
-
-  /// 转换为JSON
-  Map<String, dynamic> toJson() => _$TimelineToJson(this);
-
-  /// 复制对象并修改部分字段
+  /// Copy with modified fields
   Timeline copyWith({
     String? id,
     String? name,
@@ -90,17 +68,17 @@ class Timeline extends Equatable {
     );
   }
 
-  /// 获取按时间排序的事件列表
+  /// Get events sorted by timestamp
   List<TimelineEvent> get sortedEvents {
     final sorted = List<TimelineEvent>.from(events);
     sorted.sort((a, b) => a.timestamp.compareTo(b.timestamp));
     return sorted;
   }
 
-  /// 获取事件总数
+  /// Get total event count
   int get eventCount => events.length;
 
-  /// 获取时间线的时间跨度（天数）
+  /// Get duration in days
   int get durationInDays {
     if (events.isEmpty) return 0;
     final sorted = sortedEvents;
@@ -108,13 +86,13 @@ class Timeline extends Equatable {
     return duration.inDays;
   }
 
-  /// 获取最早的事件时间
+  /// Get earliest event time
   DateTime? get earliestEventTime {
     if (events.isEmpty) return null;
     return sortedEvents.first.timestamp;
   }
 
-  /// 获取最晚的事件时间
+  /// Get latest event time
   DateTime? get latestEventTime {
     if (events.isEmpty) return null;
     return sortedEvents.last.timestamp;
