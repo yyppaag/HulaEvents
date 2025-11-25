@@ -1,49 +1,34 @@
 import 'package:hive/hive.dart';
-import 'package:json_annotation/json_annotation.dart';
 import '../../domain/entities/event_type.dart';
 import '../../domain/entities/timeline.dart';
-import '../../domain/entities/timeline_event.dart';
 import 'timeline_event_model.dart';
 
-part 'timeline_model.g.dart';
-
-/// Timeline data model with Hive and JSON serialization
-@HiveType(typeId: 1)
-@JsonSerializable()
+/// Timeline data model with Hive serialization
 class TimelineModel extends Timeline {
   @override
-  @HiveField(0)
   final String id;
 
   @override
-  @HiveField(1)
   final String name;
 
   @override
-  @HiveField(2)
   final String description;
 
   @override
-  @HiveField(3)
   final EventType category;
 
-  @HiveField(4)
   final List<TimelineEventModel> eventModels;
 
   @override
-  @HiveField(5)
   final DateTime createdAt;
 
   @override
-  @HiveField(6)
   final DateTime updatedAt;
 
   @override
-  @HiveField(7)
   final String? coverImageUrl;
 
   @override
-  @HiveField(8)
   final int? themeColor;
 
   TimelineModel({
@@ -69,11 +54,37 @@ class TimelineModel extends Timeline {
         );
 
   /// Create from JSON
-  factory TimelineModel.fromJson(Map<String, dynamic> json) =>
-      _$TimelineModelFromJson(json);
+  factory TimelineModel.fromJson(Map<String, dynamic> json) {
+    return TimelineModel(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      description: json['description'] as String,
+      category: EventType.fromString(json['category'] as String),
+      eventModels: (json['events'] as List<dynamic>?)
+              ?.map((e) => TimelineEventModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      coverImageUrl: json['coverImageUrl'] as String?,
+      themeColor: json['themeColor'] as int?,
+    );
+  }
 
   /// Convert to JSON
-  Map<String, dynamic> toJson() => _$TimelineModelToJson(this);
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'category': category.name,
+      'events': eventModels.map((e) => e.toJson()).toList(),
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+      'coverImageUrl': coverImageUrl,
+      'themeColor': themeColor,
+    };
+  }
 
   /// Create from entity
   factory TimelineModel.fromEntity(Timeline entity) {
@@ -130,5 +141,54 @@ class TimelineModel extends Timeline {
       coverImageUrl: coverImageUrl ?? this.coverImageUrl,
       themeColor: themeColor ?? this.themeColor,
     );
+  }
+}
+
+/// Hive adapter for TimelineModel
+class TimelineModelAdapter extends TypeAdapter<TimelineModel> {
+  @override
+  final int typeId = 1;
+
+  @override
+  TimelineModel read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return TimelineModel(
+      id: fields[0] as String,
+      name: fields[1] as String,
+      description: fields[2] as String,
+      category: fields[3] as EventType,
+      eventModels: (fields[4] as List).cast<TimelineEventModel>(),
+      createdAt: fields[5] as DateTime,
+      updatedAt: fields[6] as DateTime,
+      coverImageUrl: fields[7] as String?,
+      themeColor: fields[8] as int?,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, TimelineModel obj) {
+    writer
+      ..writeByte(9)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.name)
+      ..writeByte(2)
+      ..write(obj.description)
+      ..writeByte(3)
+      ..write(obj.category)
+      ..writeByte(4)
+      ..write(obj.eventModels)
+      ..writeByte(5)
+      ..write(obj.createdAt)
+      ..writeByte(6)
+      ..write(obj.updatedAt)
+      ..writeByte(7)
+      ..write(obj.coverImageUrl)
+      ..writeByte(8)
+      ..write(obj.themeColor);
   }
 }

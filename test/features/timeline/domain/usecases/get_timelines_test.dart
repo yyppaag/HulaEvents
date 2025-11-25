@@ -42,7 +42,11 @@ void main() {
       final result = await usecase(const NoParams());
 
       // assert
-      expect(result, const Right([]));
+      expect(result.isRight(), true);
+      result.fold(
+        (failure) => fail('Should not return failure'),
+        (timelines) => expect(timelines, isEmpty),
+      );
       verify(() => mockRepository.getTimelines()).called(1);
     });
 

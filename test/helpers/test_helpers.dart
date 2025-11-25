@@ -1,4 +1,5 @@
 import 'package:mocktail/mocktail.dart';
+import 'package:hula_events/core/usecases/usecase.dart';
 import 'package:hula_events/features/timeline/domain/repositories/timeline_repository.dart';
 import 'package:hula_events/features/timeline/data/datasources/timeline_local_datasource.dart';
 import 'package:hula_events/features/timeline/domain/usecases/get_timelines.dart';
@@ -11,6 +12,7 @@ import 'package:hula_events/features/timeline/domain/usecases/update_event_in_ti
 import 'package:hula_events/features/timeline/domain/usecases/delete_event_from_timeline.dart';
 import 'package:hula_events/features/timeline/domain/entities/timeline.dart';
 import 'package:hula_events/features/timeline/domain/entities/timeline_event.dart';
+import 'package:hula_events/features/timeline/domain/entities/event_type.dart';
 import 'package:hula_events/features/timeline/data/models/timeline_model.dart';
 
 /// Mock classes for unit testing
@@ -41,4 +43,59 @@ void registerFallbackValues() {
   registerFallbackValue(FakeTimeline());
   registerFallbackValue(FakeTimelineEvent());
   registerFallbackValue(FakeTimelineModel());
+  registerFallbackValue(const NoParams());
+
+  // Register params classes for use cases
+  registerFallbackValue(CreateTimelineParams(
+    timeline: Timeline(
+      id: 'fake-id',
+      name: 'Fake Timeline',
+      description: 'Fake description',
+      category: EventType.custom,
+      events: [],
+      createdAt: DateTime(2023, 1, 1),
+      updatedAt: DateTime(2023, 1, 1),
+    ),
+  ));
+
+  registerFallbackValue(UpdateTimelineParams(
+    timeline: Timeline(
+      id: 'fake-id',
+      name: 'Fake Timeline',
+      description: 'Fake description',
+      category: EventType.custom,
+      events: [],
+      createdAt: DateTime(2023, 1, 1),
+      updatedAt: DateTime(2023, 1, 1),
+    ),
+  ));
+
+  registerFallbackValue(const DeleteTimelineParams(id: 'fake-id'));
+
+  registerFallbackValue(AddEventToTimelineParams(
+    timelineId: 'fake-id',
+    event: TimelineEvent(
+      id: 'fake-event-id',
+      title: 'Fake Event',
+      description: 'Fake description',
+      timestamp: DateTime(2023, 1, 1),
+      type: EventType.custom,
+    ),
+  ));
+
+  registerFallbackValue(UpdateEventInTimelineParams(
+    timelineId: 'fake-id',
+    event: TimelineEvent(
+      id: 'fake-event-id',
+      title: 'Fake Event',
+      description: 'Fake description',
+      timestamp: DateTime(2023, 1, 1),
+      type: EventType.custom,
+    ),
+  ));
+
+  registerFallbackValue(const DeleteEventFromTimelineParams(
+    timelineId: 'fake-id',
+    eventId: 'fake-event-id',
+  ));
 }

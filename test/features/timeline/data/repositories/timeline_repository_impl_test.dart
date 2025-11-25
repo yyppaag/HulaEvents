@@ -51,7 +51,11 @@ void main() {
       final result = await repository.getTimelines();
 
       // assert
-      expect(result, const Right([]));
+      expect(result.isRight(), true);
+      result.fold(
+        (failure) => fail('Should not return failure'),
+        (timelines) => expect(timelines, isEmpty),
+      );
     });
 
     test('should return CacheFailure when data source throws CacheException', () async {
@@ -217,7 +221,7 @@ void main() {
       final result = await repository.deleteTimeline(tId);
 
       // assert
-      expect(result, const Right(null));
+      expect(result.isRight(), true);
       verify(() => mockDataSource.deleteTimeline(tId)).called(1);
     });
 
