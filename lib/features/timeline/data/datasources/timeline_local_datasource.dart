@@ -62,9 +62,21 @@ class TimelineLocalDataSourceImpl implements TimelineLocalDataSource {
         Hive.registerAdapter(EventTypeAdapter());
       }
 
-      // Open boxes
-      _timelineBox = await Hive.openBox<TimelineModel>(AppConstants.timelineBoxName);
-      _settingsBox = await Hive.openBox(AppConstants.settingsBoxName);
+      // Try to open boxes, handle corrupted data
+      try {
+        _timelineBox = await Hive.openBox<TimelineModel>(AppConstants.timelineBoxName);
+      } catch (e) {
+        // If box is corrupted (e.g., incompatible typeIds), delete and recreate
+        await Hive.deleteBoxFromDisk(AppConstants.timelineBoxName);
+        _timelineBox = await Hive.openBox<TimelineModel>(AppConstants.timelineBoxName);
+      }
+
+      try {
+        _settingsBox = await Hive.openBox(AppConstants.settingsBoxName);
+      } catch (e) {
+        await Hive.deleteBoxFromDisk(AppConstants.settingsBoxName);
+        _settingsBox = await Hive.openBox(AppConstants.settingsBoxName);
+      }
 
       _isInitialized = true;
     } catch (e) {
