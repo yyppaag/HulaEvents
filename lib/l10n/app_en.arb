@@ -1,0 +1,257 @@
+{
+  "@@locale": "en",
+  "appName": "Hula Events",
+  "@appName": {
+    "description": "Application name"
+  },
+
+  "home": "Home",
+  "search": "Search",
+  "settings": "Settings",
+  "about": "About",
+  "logout": "Logout",
+  "login": "Login",
+  "register": "Register",
+  "cancel": "Cancel",
+  "save": "Save",
+  "delete": "Delete",
+  "edit": "Edit",
+  "confirm": "Confirm",
+  "skip": "Skip",
+  "loading": "Loading...",
+  "error": "Error",
+  "success": "Success",
+
+  "timeline": "Timeline",
+  "timelines": "Timelines",
+  "createTimeline": "Create Timeline",
+  "editTimeline": "Edit Timeline",
+  "deleteTimeline": "Delete Timeline",
+  "timelineName": "Timeline Name",
+  "timelineDescription": "Timeline Description",
+  "timelineNameHint": "e.g., Chinese Modern History",
+  "timelineDescHint": "Brief description of this timeline",
+  "selectType": "Select Type",
+  "noTimelines": "No Timelines",
+  "noTimelinesDesc": "Tap the button below to create your first timeline",
+  "timelineCreateSuccess": "Timeline created successfully",
+  "timelineDeleteSuccess": "Timeline deleted",
+  "timelineUpdateSuccess": "Timeline updated",
+  "confirmDeleteTimeline": "Confirm delete this timeline? This action cannot be undone.",
+
+  "event": "Event",
+  "events": "Events",
+  "addEvent": "Add Event",
+  "editEvent": "Edit Event",
+  "deleteEvent": "Delete Event",
+  "eventTitle": "Event Title",
+  "eventDescription": "Event Description",
+  "eventTitleHint": "e.g., Company Founded",
+  "eventDescHint": "Detailed description of this event...",
+  "eventType": "Event Type",
+  "eventDate": "Date",
+  "eventTime": "Time",
+  "eventTags": "Tags",
+  "eventTagsHint": "e.g., Important, Milestone, Turning Point",
+  "eventImage": "Image URL",
+  "eventVideo": "Video URL",
+  "markImportant": "Mark as Important",
+  "importantEventDesc": "Important events will be highlighted with a star on the timeline",
+  "eventAddSuccess": "Event added successfully",
+  "eventUpdateSuccess": "Event updated successfully",
+  "eventDeleteSuccess": "Event deleted",
+  "confirmDeleteEvent": "Confirm delete this event? This action cannot be undone.",
+  "eventCount": "{count} events",
+  "@eventCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "durationDays": "{days} days",
+  "@durationDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+
+  "basicInfo": "Basic Information",
+  "timeSettings": "Time Settings",
+  "multimedia": "Multimedia (Optional)",
+  "optional": "Optional",
+  "required": "Required",
+
+  "typeHistory": "History",
+  "typeBiography": "Biography",
+  "typeMovie": "Movie",
+  "typeProject": "Project",
+  "typeCustom": "Custom",
+
+  "userProfile": "User Profile",
+  "notLoggedIn": "Not Logged In",
+  "loginToEnjoyMore": "Login to enjoy more features",
+  "loginRegister": "Login / Register",
+  "accountInfo": "Account Information",
+  "userId": "User ID",
+  "registrationDate": "Registration Date",
+  "lastLogin": "Last Login",
+  "displayName": "Display Name",
+  "displayNameHint": "Enter your display name",
+  "editProfile": "Edit Profile",
+  "changePassword": "Change Password",
+  "profileUpdated": "Profile updated",
+  "passwordUpdated": "Password updated",
+
+  "username": "Username",
+  "email": "Email",
+  "password": "Password",
+  "confirmPassword": "Confirm Password",
+  "currentPassword": "Current Password",
+  "newPassword": "New Password",
+  "confirmNewPassword": "Confirm New Password",
+  "usernameHint": "Enter username",
+  "emailHint": "Enter email address",
+  "passwordHint": "Enter password",
+  "usernameOrEmail": "Username or Email",
+
+  "loginYourAccount": "Login to Your Account",
+  "createNewAccount": "Create New Account",
+  "noAccountYet": "Don't have an account?",
+  "registerNow": "Register Now",
+  "alreadyHaveAccount": "Already have an account?",
+  "backToLogin": "Back to Login",
+  "skipLoginLater": "Skip, login later",
+  "loginSuccess": "Login successful!",
+  "registerSuccess": "Registration successful!",
+  "loggedOut": "Logged out",
+
+  "subscriptionStatus": "Subscription Status",
+  "subscriptionExpiry": "Expiry Date",
+  "subscriptionFree": "Free",
+  "subscriptionPremium": "Premium",
+  "subscriptionProfessional": "Professional",
+  "upgradeMembership": "Upgrade Membership",
+  "viewMembership": "View Membership",
+
+  "timelineLimit": "Timeline Limit",
+  "eventLimit": "Event Limit (per timeline)",
+  "unlimited": "Unlimited",
+  "itemsCount": "{count} items",
+  "@itemsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+
+  "reachedTimelineLimit": "Timeline Limit Reached",
+  "reachedEventLimit": "Event Limit Reached",
+  "timelineLimitDesc": "You are currently a {tier}, and have reached the timeline creation limit ({limit}). \n\nUpgrade to Professional to create unlimited timelines!",
+  "@timelineLimitDesc": {
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "eventLimitDesc": "You are currently a {tier}, and have reached the event creation limit ({limit}) for this timeline.\n\nUpgrade to Professional to add unlimited events!",
+  "@eventLimitDesc": {
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "guestTimelineLimit": "In guest mode, you can only create up to 3 timelines.\n\nLogin or register to enjoy more privileges!",
+  "guestEventLimit": "In guest mode, each timeline can only have up to 10 events.\n\nLogin or register to enjoy more privileges!",
+  "goLogin": "Go Login",
+  "freeUser": "free user",
+  "premiumMember": "premium member",
+
+  "dataManagement": "Data Management",
+  "importData": "Import Data",
+  "exportData": "Export Data",
+  "clearAllData": "Clear All Data",
+  "importExportDesc": "Import/Export timeline data",
+
+  "searchTimelines": "Search Timelines",
+  "searchEvents": "Search Events",
+  "searchHint": "Enter keywords to search...",
+  "noResults": "No Results",
+
+  "confirmLogout": "Confirm Logout",
+  "confirmLogoutDesc": "Are you sure you want to logout?",
+
+  "welcomeMessage": "Welcome to Hula Events! Sample data has been loaded for you",
+
+  "validationUsernameRequired": "Please enter username",
+  "validationUsernameLength": "Username must be at least 3 characters",
+  "validationEmailRequired": "Please enter email",
+  "validationEmailInvalid": "Invalid email format",
+  "validationPasswordRequired": "Please enter password",
+  "validationPasswordLength": "Password must be at least 6 characters",
+  "validationPasswordMismatch": "Passwords do not match",
+  "validationConfirmPassword": "Please confirm password",
+  "validationTimelineNameRequired": "Please enter timeline name",
+  "validationTimelineDescRequired": "Please enter timeline description",
+  "validationEventTitleRequired": "Please enter event title",
+  "validationEventDescRequired": "Please enter event description",
+
+  "errorUsernameExists": "Username already exists",
+  "errorEmailExists": "Email already registered",
+  "errorUserNotFound": "User not exist",
+  "errorWrongPassword": "Incorrect password",
+  "errorOldPasswordWrong": "Old password incorrect",
+
+  "premiumFeatures": "Premium Features",
+  "premiumPrice": "¥30/month",
+  "professionalPrice": "¥50/month",
+  "premiumFeature1": "Unlimited timelines",
+  "premiumFeature2": "100 events per timeline",
+  "premiumFeature3": "Cloud data sync",
+  "premiumFeature4": "Remove ads",
+  "professionalFeature1": "Unlimited timelines",
+  "professionalFeature2": "Unlimited events",
+  "professionalFeature3": "Cloud data sync",
+  "professionalFeature4": "Data export feature",
+  "professionalFeature5": "Priority support",
+
+  "selectMembership": "Select the membership tier you want to upgrade to:",
+  "upgradeTo": "Upgrade to {tier}",
+  "@upgradeTo": {
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      }
+    }
+  },
+  "upgradeSuccess": "Successfully upgraded to {tier}!",
+  "@upgradeSuccess": {
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      }
+    }
+  },
+
+  "version": "Version {version}",
+  "@version": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "aboutDesc": "An elegant timeline animation app",
+  "aboutDesc2": "For displaying and managing various events in chronological order"
+}
